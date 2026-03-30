@@ -19,27 +19,27 @@ export default function Home() {
             priority
           />
           <div>
-            <p className="text-sm font-medium text-zinc-400 dark:text-zinc-500 mb-3 tracking-wide uppercase">Hello, I&apos;m</p>
-            <h1 className="text-5xl font-bold tracking-tight mb-4">Jan Cifra</h1>
+            <h1 className="text-5xl font-bold tracking-tight mb-1">Jan Cifra</h1>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Principal, Cifra &amp; Co</p>
             <p className="text-xl text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
-              People &amp; Technology. Entrepreneur and executive building companies at the intersection of e-commerce, hosting, and digital innovation in Central Europe.
+              Operator and investor. I work with founders and boards on the hard problems — leadership transitions, growth, and building things that last.
             </p>
-          <div className="mt-8 flex gap-3">
-            <a
-              href="#contact"
-              className="px-5 py-2.5 rounded-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-medium hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors"
-            >
-              Get in touch
-            </a>
-            <a
-              href="https://www.linkedin.com/in/jancifra"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-            >
-              LinkedIn
-            </a>
-          </div>
+            <div className="mt-8 flex gap-3">
+              <a
+                href="#contact"
+                className="px-5 py-2.5 rounded-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-medium hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors"
+              >
+                Get in touch
+              </a>
+              <a
+                href="https://www.linkedin.com/in/jancifra"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                LinkedIn
+              </a>
+            </div>
           </div>
         </section>
 
@@ -48,13 +48,23 @@ export default function Home() {
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">About</h2>
           <div className="space-y-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
             <p>
-              I&apos;m an entrepreneur and tech executive based in Bratislava, Slovakia, with a passion for people and technology. I focus on building and scaling businesses in e-commerce, web hosting, and digital services across Central Europe.
+              I work with founders, boards, and investors who need senior operational experience — not just advice. Through Cifra &amp; Co, I take on executive roles, board seats, and advisory mandates across Central Europe, typically in technology and digital businesses at inflection points.
             </p>
             <p>
-              I hold an MBA from Vlerick Business School (graduated with Great Distinction) and completed the Executive Program in Strategy and Organization at Stanford GSB. I&apos;m actively involved in the Slovak startup and innovation ecosystem as a board member of SAPIE.
+              Earlier I spent six years scaling a web hosting group from a single brand to a multi-country operation, before moving into e-commerce as CEO of Dedoles. I hold an MBA from Vlerick Business School and completed the Executive Program in Strategy and Organization at Stanford GSB. I&apos;m a board member of SAPIE, the Slovak alliance for innovation and the startup ecosystem.
             </p>
             <p>
-              I speak Slovak, English, German, and Czech.
+              Based in Bratislava. I work in Slovak, English, German, and Czech.
+            </p>
+          </div>
+        </section>
+
+        {/* Investments */}
+        <section id="investments">
+          <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">Investments</h2>
+          <div className="space-y-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <p>
+              Alongside operational work, I invest in early-stage and growth-stage companies — primarily in technology, SaaS, and digital infrastructure. I look for founders who are building in sectors I know well and who want more than capital: a hands-on partner who has run a P&amp;L and sat on both sides of the table.
             </p>
           </div>
         </section>
@@ -76,8 +86,8 @@ export default function Home() {
                 description: "Stepping in as interim CEO or senior executive when organisations need proven leadership during transitions, restructuring, or rapid scaling.",
               },
               {
-                title: "Crisis Management",
-                description: "Hands-on support when things go wrong — financial distress, operational breakdown, or leadership gaps. Focused on stabilisation first, recovery second.",
+                title: "Turnaround & Recovery",
+                description: "Hands-on support when a business has lost its footing — financial distress, operational breakdown, or leadership gaps. Focused on stabilisation first, then getting back on track.",
               },
               {
                 title: "Executive Coaching",
@@ -107,7 +117,7 @@ export default function Home() {
         <section>
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">Experience</h2>
           <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-            20 years across software, web hosting, e-commerce, and consulting — from service desk to CEO.
+            20 years across software, cloud services, e-commerce, and consulting — from service desk to CEO.
             Currently leading Dedoles and serving on the boards of Vacuumlabs and SAPIE.
           </p>
           <Link
