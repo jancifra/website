@@ -22,7 +22,7 @@ export default function Home() {
             <h1 className="text-5xl font-bold tracking-tight mb-1">Jan Cifra</h1>
             <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Principal, Cifra &amp; Co</p>
             <p className="text-xl text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
-              Operator and investor. I work with founders and boards on the hard problems — leadership transitions, growth, and building things that last.
+              Operator, strategist, and investor. I work with founders and boards on the hard problems — strategy, leadership transitions, growth, and building things that last.
             </p>
             <div className="mt-8 flex gap-3">
               <a
@@ -48,7 +48,7 @@ export default function Home() {
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">About</h2>
           <div className="space-y-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
             <p>
-              I work with founders, boards, and investors who need senior operational experience — not just advice. Through Cifra &amp; Co, I take on executive roles, board seats, and advisory mandates across Central Europe, typically in technology and digital businesses at inflection points.
+              I work with founders, boards, and investors who need senior operational and strategic experience — not just advice. Through Cifra &amp; Co, I take on executive roles, board seats, and advisory mandates across Central Europe, typically in technology and digital businesses at inflection points.
             </p>
             <p>
               Earlier I spent six years scaling a web hosting group from a single brand to a multi-country operation, before moving into e-commerce as CEO of Dedoles. I hold an MBA from Vlerick Business School and completed the Executive Program in Strategy and Organization at Stanford GSB. I&apos;m a board member of SAPIE, the Slovak alliance for innovation and the startup ecosystem.
@@ -64,7 +64,7 @@ export default function Home() {
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">Investments</h2>
           <div className="space-y-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
             <p>
-              Alongside operational work, I invest in early-stage and growth-stage companies — primarily in technology, SaaS, and digital infrastructure. I look for founders who are building in sectors I know well and who want more than capital: a hands-on partner who has run a P&amp;L and sat on both sides of the table.
+              Alongside operational and strategic work, I invest in early-stage and growth-stage companies — primarily in technology, SaaS, and digital infrastructure. I look for founders who are building in sectors I know well and who want more than capital: a hands-on partner who has run a P&amp;L, shaped strategy, and sat on both sides of the table.
             </p>
           </div>
         </section>
@@ -73,7 +73,7 @@ export default function Home() {
         <section id="services">
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-2">Services</h2>
           <p className="text-zinc-600 dark:text-zinc-400 mb-8 leading-relaxed">
-            I work with founders, boards, and investors who need senior operational experience — not just advice.
+            I work with founders, boards, and investors who need senior strategic and operational experience — not just advice.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
