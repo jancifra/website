@@ -55,12 +55,6 @@ const jobs = [
     period: "Nov 2006 – May 2009",
     description: "Managed global software development across SAP Netweaver, Lotus Notes, and Master Data. Led key projects including platform migrations and the Qimonda carve-out from Infineon.",
   },
-  {
-    role: "Expert Support Center Specialist",
-    company: "Infineon Technologies",
-    period: "Nov 2005 – Nov 2006",
-    description: "Part-time service desk agent.",
-  },
 ];
 
 export default function ExperiencePage() {
