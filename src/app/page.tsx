@@ -20,7 +20,7 @@ export default function Home() {
           />
           <div>
             <h1 className="text-5xl font-bold tracking-tight mb-1">Jan Cifra</h1>
-            <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Principal, Cifra &amp; Co</p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Operator · Strategist · Investor</p>
             <p className="text-xl text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
               Operator, strategist, and investor. I work with founders and boards on the hard problems — strategy, leadership transitions, growth, and building things that last.
             </p>
@@ -48,7 +48,7 @@ export default function Home() {
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">About</h2>
           <div className="space-y-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
             <p>
-              I work with founders, boards, and investors who need senior operational and strategic experience — not just advice. Through Cifra &amp; Co, I take on executive roles, board seats, and advisory mandates across Central Europe, typically in technology and digital businesses at inflection points.
+              I work with founders, boards, and investors who need senior operational and strategic experience — not just advice. I take on executive roles, board seats, and advisory mandates across Central Europe, typically in technology and digital businesses at inflection points.
             </p>
             <p>
               Earlier I spent six years scaling a web hosting group from a single brand to a multi-country operation, before moving into e-commerce as CEO of Dedoles. I hold an MBA from Vlerick Business School and completed the Executive Program in Strategy and Organization at Stanford GSB. I&apos;m a board member of SAPIE, the Slovak alliance for innovation and the startup ecosystem.
