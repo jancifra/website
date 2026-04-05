@@ -2,14 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Platformer</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: #1a1a2e; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+      /* 100dvh = dynamic viewport height (excludes browser chrome on iOS Safari 15.4+).
+         -webkit-fill-available covers older iOS Safari.
+         Plain 100vh is the ultimate fallback. */
+      html { height: -webkit-fill-available; }
+      body {
+        background: #1a1a2e;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        height: -webkit-fill-available;
+        height: 100dvh;
+        /* Keep content within safe areas (notch / home indicator) */
+        padding: env(safe-area-inset-top, 0px)
+                 env(safe-area-inset-right, 0px)
+                 env(safe-area-inset-bottom, 0px)
+                 env(safe-area-inset-left, 0px);
+        overflow: hidden;
+      }
       canvas { touch-action: none; user-select: none; }
     </style>
-    <script type="module" crossorigin src="/game/assets/index-BmWQrysC.js"></script>
+    <script type="module" crossorigin src="/game/assets/index-DGAayqTO.js"></script>
   </head>
   <body>
   </body>
