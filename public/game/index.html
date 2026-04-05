@@ -6,38 +6,50 @@
     <title>Platformer</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body {
-        background: #1a1a2e;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        /* JS overrides width/height at runtime; these are just fallbacks */
-        width: 100vw;
-        height: 100dvh;
-        overflow: hidden;
-      }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; }
+      #game-container { position: relative; overflow: hidden; background: #1a1a2e; }
       canvas { touch-action: none; user-select: none; display: block; }
     </style>
     <script>
-      // CSS viewport units are unreliable on iOS Safari — 100vh/dvh can include
-      // the address-bar area, causing the canvas to overflow the visible screen.
-      // window.innerHeight always reflects the *current* visual viewport height,
-      // so we drive the body size from JS and refresh on every resize.
+      // CSS viewport units (100vh, 100dvh) are unreliable on iOS Safari —
+      // they can include the address-bar / tab-bar area so the canvas
+      // overflows the visible screen.  window.visualViewport.height is the
+      // only value that always matches what the user can actually see.
       (function () {
+        var lastW = 0, lastH = 0;
+
         function fit() {
-          var vv = window.visualViewport;
-          document.body.style.width  = (vv ? vv.width  : window.innerWidth)  + 'px';
-          document.body.style.height = (vv ? vv.height : window.innerHeight) + 'px';
+          var vv  = window.visualViewport;
+          var w   = Math.floor(vv ? vv.width  : window.innerWidth);
+          var h   = Math.floor(vv ? vv.height : window.innerHeight);
+          if (w === lastW && h === lastH) return;
+          lastW = w; lastH = h;
+
+          var el = document.getElementById('game-container');
+          if (el) { el.style.width = w + 'px'; el.style.height = h + 'px'; }
+
+          // Tell Phaser's ScaleManager to re-measure its parent container
+          window.dispatchEvent(new Event('resize'));
         }
-        fit();
-        var target = window.visualViewport || window;
-        target.addEventListener('resize', fit);
-        // Re-run once the page is fully laid out in case metrics shifted
+
+        // Size the container as soon as the DOM node exists
+        document.addEventListener('DOMContentLoaded', fit);
+        // Keep it in sync when browser chrome shows/hides or device rotates
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', fit);
+          window.visualViewport.addEventListener('scroll', fit);
+        }
+        window.addEventListener('resize',      fit);
+        window.addEventListener('orientationchange', function () {
+          // Short delay: orientation metrics settle after the event fires
+          setTimeout(fit, 100);
+        });
         window.addEventListener('load', fit);
       }());
     </script>
-    <script type="module" crossorigin src="/game/assets/index-DDzfS0BV.js"></script>
+    <script type="module" crossorigin src="/game/assets/index-Dhtd28h4.js"></script>
   </head>
   <body>
+    <div id="game-container"></div>
   </body>
 </html>
