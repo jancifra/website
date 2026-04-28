@@ -40,7 +40,7 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
     console.error("TURNSTILE_SECRET_KEY not configured");
-    return { ok: false, error: "Server is not configured. Please email contact@cifra.co directly." };
+    return { ok: false, error: "Server is not configured. Please email jan@cifra.co directly." };
   }
   if (!token) {
     return { ok: false, error: "Please complete the verification challenge." };
@@ -62,11 +62,11 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL ?? "contact@cifra.co";
-  const from = process.env.CONTACT_FROM_EMAIL ?? "noreply@cifra.co";
+  const to = process.env.CONTACT_TO_EMAIL ?? "jan@cifra.co";
+  const from = process.env.CONTACT_FROM_EMAIL ?? "contact@cifra.co";
   if (!apiKey) {
     console.error("RESEND_API_KEY not configured");
-    return { ok: false, error: "Server is not configured. Please email contact@cifra.co directly." };
+    return { ok: false, error: "Server is not configured. Please email jan@cifra.co directly." };
   }
 
   const resend = new Resend(apiKey);
@@ -89,11 +89,11 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
     });
     if (error) {
       console.error("Resend error:", error);
-      return { ok: false, error: "Failed to send. Please try again or email contact@cifra.co directly." };
+      return { ok: false, error: "Failed to send. Please try again or email jan@cifra.co directly." };
     }
   } catch (err) {
     console.error("Resend exception:", err);
-    return { ok: false, error: "Failed to send. Please try again or email contact@cifra.co directly." };
+    return { ok: false, error: "Failed to send. Please try again or email jan@cifra.co directly." };
   }
 
   return { ok: true };
