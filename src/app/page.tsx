@@ -57,6 +57,16 @@ export default function Home() {
               Based in Bratislava. I work in Slovak, English, German, and Czech.
             </p>
           </div>
+          <figure className="mt-10 -mx-6 sm:mx-0">
+            <Image
+              src="/speaking-1.jpg"
+              alt="Jan Cifra speaking at New Retail Summit 2026"
+              width={1080}
+              height={720}
+              className="w-full h-auto sm:rounded-2xl object-cover"
+              sizes="(min-width: 768px) 768px, 100vw"
+            />
+          </figure>
         </section>
 
         {/* Investments */}

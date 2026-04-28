@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
@@ -68,6 +69,17 @@ export default function ExperiencePage() {
           </Link>
           <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">Experience</h1>
           <p className="text-zinc-500 dark:text-zinc-400">20 years across software, hosting, e-commerce, and consulting.</p>
+          <figure className="mt-10 -mx-6 sm:mx-0">
+            <Image
+              src="/speaking-2.jpg"
+              alt="Jan Cifra speaking at New Retail Summit 2026"
+              width={1080}
+              height={720}
+              className="w-full h-auto sm:rounded-2xl object-cover"
+              sizes="(min-width: 768px) 768px, 100vw"
+              priority
+            />
+          </figure>
         </div>
         <div className="space-y-10">
           {jobs.map((job) => (
