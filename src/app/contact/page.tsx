@@ -26,6 +26,26 @@ export default function ContactPage() {
         </div>
 
         <ContactForm siteKey={siteKey} />
+
+        <div className="mt-12 flex items-center gap-4" aria-hidden="true">
+          <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-800" />
+          <span className="text-xs uppercase tracking-widest text-zinc-400 dark:text-zinc-500">or</span>
+          <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-800" />
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-zinc-500 dark:text-zinc-400 mb-4">
+            Prefer LinkedIn? Send a connection request and a short note.
+          </p>
+          <a
+            href="https://www.linkedin.com/in/jancifra"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-zinc-200 dark:border-zinc-700 text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            Connect on LinkedIn →
+          </a>
+        </div>
       </main>
       <footer className="border-t border-zinc-100 dark:border-zinc-800">
         <div className="max-w-3xl mx-auto px-6 py-6 text-sm text-zinc-400 dark:text-zinc-600">
