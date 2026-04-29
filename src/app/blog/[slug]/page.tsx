@@ -11,15 +11,48 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const { meta } = getPost(slug);
-  return { title: `${meta.title} · Jan Cifra` };
+  const url = `/blog/${slug}`;
+  return {
+    title: meta.title,
+    description: meta.excerpt,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      title: meta.title,
+      description: meta.excerpt,
+      url,
+      publishedTime: meta.date,
+      authors: ["Jan Cifra"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta.title,
+      description: meta.excerpt,
+    },
+  };
 }
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { meta, content } = getPost(slug);
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: meta.title,
+    description: meta.excerpt,
+    datePublished: meta.date,
+    author: { "@type": "Person", name: "Jan Cifra", url: "https://cifra.co" },
+    url: `https://cifra.co/blog/${slug}`,
+    mainEntityOfPage: `https://cifra.co/blog/${slug}`,
+  };
+
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans dark:bg-zinc-950 dark:text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <Nav />
       <main className="max-w-3xl mx-auto px-6 pt-32 pb-24">
         <div className="mb-10">

@@ -4,7 +4,9 @@ import Nav from "@/components/Nav";
 import { getAllPosts } from "@/lib/posts";
 
 export const metadata: Metadata = {
-  title: "Writing · Jan Cifra",
+  title: "Writing",
+  description: "Notes by Jan Cifra on strategy, leadership, and building organisations.",
+  alternates: { canonical: "/blog" },
 };
 
 export default function BlogPage() {

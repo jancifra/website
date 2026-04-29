@@ -13,9 +13,45 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = "https://cifra.co";
+const siteDescription =
+  "Operator, strategist, and investor. I work with founders and boards on strategy, leadership transitions, growth, and building things that last.";
+
 export const metadata: Metadata = {
-  title: "Jan Cifra",
-  description: "Personal portfolio of Jan Cifra",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Jan Cifra · Operator · Strategist · Investor",
+    template: "%s · Jan Cifra",
+  },
+  description: siteDescription,
+  authors: [{ name: "Jan Cifra", url: siteUrl }],
+  creator: "Jan Cifra",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Jan Cifra",
+    title: "Jan Cifra · Operator · Strategist · Investor",
+    description: siteDescription,
+    url: siteUrl,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Jan Cifra · Operator · Strategist · Investor",
+    description: siteDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({

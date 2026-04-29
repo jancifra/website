@@ -1,10 +1,46 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import Nav from "@/components/Nav";
 
+export const metadata: Metadata = {
+  title: {
+    absolute: "Jan Cifra · Operator · Strategist · Investor",
+  },
+  description:
+    "Jan Cifra — operator, strategist, and investor based in Bratislava. CEO of Dedoles, board member at Vacuumlabs and SAPIE. Working with founders and boards on strategy, leadership, and growth.",
+  alternates: { canonical: "/" },
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Jan Cifra",
+  url: "https://cifra.co",
+  jobTitle: "Chief Executive Officer",
+  worksFor: { "@type": "Organization", name: "Dedoles" },
+  description:
+    "Operator, strategist, and investor working with founders and boards on strategy, leadership transitions, growth, and building things that last.",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Bratislava",
+    addressCountry: "SK",
+  },
+  alumniOf: [
+    { "@type": "EducationalOrganization", name: "Vlerick Business School" },
+    { "@type": "EducationalOrganization", name: "Stanford Graduate School of Business" },
+  ],
+  knowsLanguage: ["English", "Slovak", "German", "Czech"],
+  sameAs: ["https://www.linkedin.com/in/jancifra"],
+};
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans dark:bg-zinc-950 dark:text-zinc-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
       <Nav />
 
       <main className="max-w-3xl mx-auto px-6 pt-32 pb-24 space-y-24">

@@ -4,7 +4,10 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "Experience · Jan Cifra",
+  title: "Experience",
+  description:
+    "20 years across software, hosting, e-commerce, and consulting — from service desk to CEO. Currently CEO of Dedoles, board member at Vacuumlabs and SAPIE.",
+  alternates: { canonical: "/experience" },
 };
 
 const jobs = [
