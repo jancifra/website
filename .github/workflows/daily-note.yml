@@ -32,7 +32,7 @@ jobs:
 
       - name: Generate note
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.CIFRA_NOTES_CRON }}
           FORCE_NOTE: ${{ inputs.force == true && '1' || '' }}
         run: npm run note:generate
 
