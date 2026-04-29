@@ -81,12 +81,18 @@ function extractJson(text) {
 
 async function main() {
   const date = todayDate();
-  const outPath = path.join(NOTES_DIR, `${date}.json`);
+  const force = !!process.env.FORCE_NOTE && process.env.FORCE_NOTE !== "0" && process.env.FORCE_NOTE !== "false";
 
-  if (fs.existsSync(outPath)) {
+  const outFilename = force
+    ? `test-${date}-${Date.now()}.json`
+    : `${date}.json`;
+  const outPath = path.join(NOTES_DIR, outFilename);
+
+  if (!force && fs.existsSync(outPath)) {
     log(`Note for ${date} already exists at ${outPath}, skipping.`);
     process.exit(0);
   }
+  if (force) log("FORCE_NOTE set — generating test note that will not render on /notes.");
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
