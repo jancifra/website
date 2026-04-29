@@ -71,7 +71,7 @@ export default function ExperiencePage() {
             ← Back
           </Link>
           <h1 className="text-3xl font-bold tracking-tight mt-6 mb-2">Experience</h1>
-          <p className="text-zinc-500 dark:text-zinc-400">20 years across software, hosting, e-commerce, and consulting.</p>
+          <p className="text-zinc-500 dark:text-zinc-400">20 years across software, hosting, e-commerce, and consulting in Central Europe — from service desk to CEO of Dedoles.</p>
           <figure className="mt-10 -mx-6 sm:mx-0">
             <Image
               src="/speaking-2.jpg"

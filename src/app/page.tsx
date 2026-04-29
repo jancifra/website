@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     absolute: "Jan Cifra · Operator · Strategist · Investor",
   },
   description:
-    "Jan Cifra — operator, strategist, and investor based in Bratislava. CEO of Dedoles, board member at Vacuumlabs and SAPIE. Working with founders and boards on strategy, leadership, and growth.",
+    "Jan Cifra — operator, strategist, and investor based in Bratislava. CEO of Dedoles, independent board member at Vacuumlabs and SAPIE. Executive leadership, board mandates, and growth strategy for technology, SaaS, and e-commerce businesses across Central Europe and DACH.",
   alternates: { canonical: "/" },
 };
 
@@ -20,7 +20,7 @@ const personJsonLd = {
   jobTitle: "Chief Executive Officer",
   worksFor: { "@type": "Organization", name: "Dedoles" },
   description:
-    "Operator, strategist, and investor working with founders and boards on strategy, leadership transitions, growth, and building things that last.",
+    "Operator, strategist, and investor based in Bratislava. CEO of Dedoles. Works with founders and boards across Central Europe and DACH on strategy, leadership transitions, and scaling technology, SaaS, and e-commerce businesses.",
   address: {
     "@type": "PostalAddress",
     addressLocality: "Bratislava",
@@ -58,7 +58,7 @@ export default function Home() {
             <h1 className="text-5xl font-bold tracking-tight mb-1">Jan Cifra</h1>
             <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">Operator · Strategist · Investor</p>
             <p className="text-xl text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
-              Operator, strategist, and investor. I work with founders and boards on the hard problems — strategy, leadership transitions, growth, and building things that last.
+              Operator, strategist, and investor based in Bratislava. I work with founders and boards across Central Europe on strategy, leadership transitions, and scaling technology businesses through inflection points.
             </p>
             <div className="mt-8 flex gap-3">
               <Link
@@ -84,10 +84,10 @@ export default function Home() {
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">About</h2>
           <div className="space-y-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
             <p>
-              I work with founders, boards, and investors who need senior operational and strategic experience — not just advice. I take on executive roles, board seats, and advisory mandates across Central Europe, typically in technology and digital businesses at inflection points.
+              I take on executive leadership roles, independent board seats, and senior advisory work across Slovakia and the wider Central Europe and DACH region. My focus is technology, SaaS, and e-commerce businesses at inflection points — scaling, leadership transitions, restructuring, or preparing for an exit.
             </p>
             <p>
-              Earlier I spent six years scaling a web hosting group from a single brand to a multi-country operation, before moving into e-commerce as CEO of Dedoles. I hold an MBA from Vlerick Business School and completed the Executive Program in Strategy and Organization at Stanford GSB. I&apos;m a board member of SAPIE, the Slovak alliance for innovation and the startup ecosystem.
+              Earlier I spent six years scaling a CEE web hosting group — WebSupport, Active24, and Webonic — from a single brand into a multi-country operation, before becoming CEO of Dedoles, one of Central Europe&apos;s fastest-growing e-commerce brands. MBA from Vlerick Business School; Executive Program in Strategy and Organization at Stanford GSB. Independent board member at Vacuumlabs and SAPIE, the Slovak alliance for innovation.
             </p>
             <p>
               Based in Bratislava. I work in Slovak, English, German, and Czech.
@@ -110,7 +110,7 @@ export default function Home() {
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">Investments</h2>
           <div className="space-y-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
             <p>
-              Alongside operational and strategic work, I invest in early-stage and growth-stage companies — primarily in technology, SaaS, and digital infrastructure. I look for founders who are building in sectors I know well and who want more than capital: a hands-on partner who has run a P&amp;L, shaped strategy, and sat on both sides of the table.
+              Alongside operational and strategic work, I invest in early-stage and growth-stage companies in Central Europe — primarily technology, SaaS, e-commerce, and digital infrastructure. I look for founders who want more than capital: a hands-on partner who has run a P&amp;L, scaled a multi-country operation, and sat on both sides of the table.
             </p>
           </div>
         </section>
@@ -128,8 +128,8 @@ export default function Home() {
                 description: "Independent board representation for tech and digital companies. I bring operational depth, a founder's perspective, and a direct challenge to strategic assumptions.",
               },
               {
-                title: "Interim Management",
-                description: "Stepping in as interim CEO or senior executive when organisations need proven leadership during transitions, restructuring, or rapid scaling.",
+                title: "Executive Leadership",
+                description: "Taking on CEO or senior executive roles when organisations need proven leadership during transitions, restructuring, or rapid scaling.",
               },
               {
                 title: "Turnaround & Recovery",
@@ -163,8 +163,8 @@ export default function Home() {
         <section>
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">Experience</h2>
           <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-            20 years across software, cloud services, e-commerce, and consulting — from service desk to CEO.
-            Currently leading Dedoles and serving on the boards of Vacuumlabs and SAPIE.
+            20 years across software, cloud services, e-commerce, and consulting in Central Europe — from service desk to CEO.
+            Currently leading Dedoles, with board roles at Vacuumlabs and SAPIE.
           </p>
           <Link
             href="/experience"

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://cifra.co";
 const siteDescription =
-  "Operator, strategist, and investor. I work with founders and boards on strategy, leadership transitions, growth, and building things that last.";
+  "Operator, strategist, and investor based in Bratislava. I work with founders and boards across Central Europe on strategy, leadership transitions, and scaling technology businesses through inflection points.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
