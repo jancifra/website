@@ -100,6 +100,42 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Notes */}
+        {latestNotes.length > 0 && (
+          <section id="notes">
+            <div className="flex items-baseline justify-between mb-6">
+              <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500">What I&apos;m reading</h2>
+              <Link
+                href="/notes"
+                className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+              >
+                All notes →
+              </Link>
+            </div>
+            <div className="space-y-6">
+              {latestNotes.map((n) => (
+                <div key={n.date} className="flex flex-col sm:flex-row gap-3 sm:gap-5">
+                  <div className="w-28 shrink-0 text-sm text-zinc-400 dark:text-zinc-500 pt-0.5">
+                    {new Date(n.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <a
+                      href={n.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium hover:underline underline-offset-4 break-words"
+                    >
+                      {n.title}
+                    </a>
+                    <span className="text-xs text-zinc-400 dark:text-zinc-500 ml-2">{hostname(n.url)}</span>
+                    <p className="text-zinc-600 dark:text-zinc-400 mt-1.5 leading-relaxed">{n.commentary}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* About */}
         <section id="about">
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">About</h2>
@@ -194,42 +230,6 @@ export default function Home() {
             View full experience →
           </Link>
         </section>
-
-        {/* Notes */}
-        {latestNotes.length > 0 && (
-          <section id="notes">
-            <div className="flex items-baseline justify-between mb-6">
-              <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500">What I&apos;m reading</h2>
-              <Link
-                href="/notes"
-                className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-              >
-                All notes →
-              </Link>
-            </div>
-            <div className="space-y-6">
-              {latestNotes.map((n) => (
-                <div key={n.date} className="flex flex-col sm:flex-row gap-3 sm:gap-5">
-                  <div className="w-28 shrink-0 text-sm text-zinc-400 dark:text-zinc-500 pt-0.5">
-                    {new Date(n.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <a
-                      href={n.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium hover:underline underline-offset-4 break-words"
-                    >
-                      {n.title}
-                    </a>
-                    <span className="text-xs text-zinc-400 dark:text-zinc-500 ml-2">{hostname(n.url)}</span>
-                    <p className="text-zinc-600 dark:text-zinc-400 mt-1.5 leading-relaxed">{n.commentary}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Contact */}
         <section id="contact">
