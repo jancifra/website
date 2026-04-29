@@ -47,11 +47,25 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     mainEntityOfPage: `https://cifra.co/blog/${slug}`,
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://cifra.co" },
+      { "@type": "ListItem", position: 2, name: "Writing", item: "https://cifra.co/blog" },
+      { "@type": "ListItem", position: 3, name: meta.title, item: `https://cifra.co/blog/${slug}` },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans dark:bg-zinc-950 dark:text-zinc-100">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Nav />
       <main className="max-w-3xl mx-auto px-6 pt-32 pb-24">

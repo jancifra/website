@@ -12,26 +12,36 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-const personJsonLd = {
+const profilePageJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Jan Cifra",
+  "@type": "ProfilePage",
   url: "https://cifra.co",
-  jobTitle: "Chief Executive Officer",
-  worksFor: { "@type": "Organization", name: "Dedoles" },
-  description:
-    "Operator, strategist, and investor based in Bratislava. CEO of Dedoles. Works with founders and boards across Central Europe and DACH on strategy, leadership transitions, and scaling technology, SaaS, and e-commerce businesses.",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Bratislava",
-    addressCountry: "SK",
+  dateModified: new Date().toISOString(),
+  mainEntity: {
+    "@type": "Person",
+    name: "Jan Cifra",
+    url: "https://cifra.co",
+    image: "https://cifra.co/jan-cifra.jpg",
+    jobTitle: "Chief Executive Officer",
+    worksFor: {
+      "@type": "Organization",
+      name: "Dedoles",
+      url: "https://www.dedoles.com",
+    },
+    description:
+      "Operator, strategist, and investor based in Bratislava. CEO of Dedoles. Works with founders and boards across Central Europe and DACH on strategy, leadership transitions, and scaling technology, SaaS, and e-commerce businesses.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Bratislava",
+      addressCountry: "SK",
+    },
+    alumniOf: [
+      { "@type": "EducationalOrganization", name: "Vlerick Business School" },
+      { "@type": "EducationalOrganization", name: "Stanford Graduate School of Business" },
+    ],
+    knowsLanguage: ["English", "Slovak", "German", "Czech"],
+    sameAs: ["https://www.linkedin.com/in/jancifra"],
   },
-  alumniOf: [
-    { "@type": "EducationalOrganization", name: "Vlerick Business School" },
-    { "@type": "EducationalOrganization", name: "Stanford Graduate School of Business" },
-  ],
-  knowsLanguage: ["English", "Slovak", "German", "Czech"],
-  sameAs: ["https://www.linkedin.com/in/jancifra"],
 };
 
 export default function Home() {
@@ -39,7 +49,7 @@ export default function Home() {
     <div className="min-h-screen bg-white text-zinc-900 font-sans dark:bg-zinc-950 dark:text-zinc-100">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
       />
       <Nav />
 
