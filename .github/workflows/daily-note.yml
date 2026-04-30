@@ -2,8 +2,10 @@ name: Daily note
 
 on:
   schedule:
-    # 08:00 UTC daily (≈ 09:00 Bratislava in winter, 10:00 in summer)
-    - cron: "0 8 * * *"
+    # 08:17 UTC daily (≈ 09:17 Bratislava in winter, 10:17 in summer).
+    # Off the top of the hour to avoid GitHub's cron queue congestion that
+    # frequently delays or skips :00 schedules.
+    - cron: "17 8 * * *"
   workflow_dispatch:
     inputs:
       force:
