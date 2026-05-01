@@ -15,6 +15,7 @@ const PROFILE_PATH = path.join(NOTES_DIR, "profile.md");
 const LOOKBACK_HOURS = 48;
 const MAX_PER_FEED = 6;
 const SHORTLIST_SIZE = 60;
+const RECENT_CONTEXT_NOTES = 10;
 const MODEL = "claude-sonnet-4-6";
 
 function todayDate() {
@@ -73,6 +74,25 @@ function loadPastNoteUrls() {
   return set;
 }
 
+function loadRecentNotes(limit) {
+  if (!fs.existsSync(NOTES_DIR)) return [];
+  const files = fs
+    .readdirSync(NOTES_DIR)
+    .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+    .sort()
+    .reverse()
+    .slice(0, limit);
+  return files
+    .map((f) => {
+      try {
+        return JSON.parse(fs.readFileSync(path.join(NOTES_DIR, f), "utf-8"));
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
 function extractJson(text) {
   const m = text.match(/\{[\s\S]*\}/);
   if (!m) throw new Error("No JSON object found in model response: " + text);
@@ -104,7 +124,8 @@ async function main() {
   const profile = fs.readFileSync(PROFILE_PATH, "utf-8");
 
   const pastUrls = loadPastNoteUrls();
-  log(`${pastUrls.size} past notes loaded for dedupe.`);
+  const recentNotes = loadRecentNotes(RECENT_CONTEXT_NOTES);
+  log(`${pastUrls.size} past notes loaded for dedupe; ${recentNotes.length} recent notes for diversity context.`);
 
   const parser = new Parser({ timeout: 15000 });
   const cutoff = Date.now() - LOOKBACK_HOURS * 3600 * 1000;
@@ -145,7 +166,24 @@ async function main() {
 
   log(`Sending ${shortlist.length} candidates to Claude (${MODEL})…`);
 
+  const recentBlock = recentNotes.length
+    ? `Recently posted notes (most recent first):
+
+${recentNotes
+  .map((n) => `- [${n.date}] "${n.title}" (${n.source}) — ${n.commentary}`)
+  .join("\n")}
+
+Diversity rules:
+- Do NOT pick a near-duplicate of any recent note above — same company's same funding round, same regulation's same vote, same product's same launch, same deal seen from a different outlet. A different angle on a still-developing story is OK only if it adds substantively new information.
+- Prefer topical variety. If the last few notes leaned heavily into one theme (e.g. AI funding, or EU regulation), tilt today's pick toward an under-represented theme from the curator profile (regulation, antitrust/M&A, big tech strategy, CEE ecosystem, operating playbooks, etc.).
+- It's better to skip than to repeat. If the only "good" candidate is a follow-up to yesterday's story and nothing else clears the bar, output {"skip": true, "reason": "..."}.`
+    : "No prior notes — first post.";
+
   const systemPrompt = `${profile}
+
+---
+
+${recentBlock}
 
 ---
 
@@ -154,7 +192,7 @@ You are picking ONE article from the candidate list below for today's note.
 Rules:
 - The "url" you return MUST be one of the candidate URLs verbatim. Do not invent or rewrite URLs.
 - Commentary: 1–2 sentences, max 50 words, in the voice described above.
-- If nothing in the list is genuinely interesting per the topic and quality bar, output {"skip": true, "reason": "<one short sentence>"}.
+- If nothing in the list is genuinely interesting per the topic and quality bar, OR everything is a near-duplicate of recent notes, output {"skip": true, "reason": "<one short sentence>"}.
 
 Output ONLY a JSON object, no prose around it. Schema:
 {"url": "...", "title": "...", "source": "...", "commentary": "..."}`;
