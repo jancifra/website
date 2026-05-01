@@ -16,6 +16,18 @@ function escapeXml(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
+function escapeCdata(s: string): string {
+  return s.replace(/]]>/g, "]]]]><![CDATA[>");
+}
+
+function escapeHtmlAttr(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+function escapeHtmlText(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function rfc822(date: string): string {
   // Anchor each note at noon UTC on its date so the timestamp is deterministic
   // and stable regardless of when the build runs.
@@ -30,20 +42,23 @@ export function GET() {
 
   const items = notes
     .map((n) => {
-      const description = `${escapeXml(n.commentary)} <a href="${escapeXml(n.url)}">${escapeXml(n.source)} →</a>`;
+      const html =
+        `<p>${escapeHtmlText(n.commentary)}</p>` +
+        `<p><a href="${escapeHtmlAttr(n.url)}">${escapeHtmlText(n.source)} →</a></p>`;
       return `    <item>
       <title>${escapeXml(n.title)}</title>
       <link>${escapeXml(n.url)}</link>
       <guid isPermaLink="false">cifra.co/notes/${n.date}</guid>
       <pubDate>${rfc822(n.date)}</pubDate>
       <source url="${escapeXml(n.url)}">${escapeXml(n.source)}</source>
-      <description>${description}</description>
+      <description><![CDATA[${escapeCdata(n.commentary)}]]></description>
+      <content:encoded><![CDATA[${escapeCdata(html)}]]></content:encoded>
     </item>`;
     })
     .join("\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>${escapeXml(FEED_TITLE)}</title>
     <link>${NOTES_URL}</link>
