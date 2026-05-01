@@ -7,7 +7,12 @@ export const metadata: Metadata = {
   title: "Notes",
   description:
     "Daily links and short commentary on tech, AI, regulation, VC, and the businesses Jan Cifra finds interesting.",
-  alternates: { canonical: "/notes" },
+  alternates: {
+    canonical: "/notes",
+    types: {
+      "application/rss+xml": [{ url: "/notes/rss.xml", title: "Jan Cifra · Notes" }],
+    },
+  },
 };
 
 function formatDate(d: string) {
@@ -37,6 +42,12 @@ export default function NotesPage() {
           <p className="text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed">
             One link a day. Tech, AI, regulation, VC, and the moves of the companies that matter.
           </p>
+          <a
+            href="/notes/rss.xml"
+            className="inline-block mt-4 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          >
+            RSS →
+          </a>
         </div>
 
         {notes.length === 0 ? (
