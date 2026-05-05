@@ -26,6 +26,43 @@ function log(...args) {
   console.error("[generate-note]", ...args);
 }
 
+// Tracking params we strip so the LLM doesn't have a reason to "clean up" the
+// URL we hand it (and so different feed surfacings of the same article dedupe).
+const TRACKING_PARAM_PATTERNS = [
+  /^utm_/i,
+  /^mc_/i,
+  /^_ga$/i,
+  /^_gl$/i,
+  /^fbclid$/i,
+  /^gclid$/i,
+  /^msclkid$/i,
+  /^dclid$/i,
+  /^yclid$/i,
+  /^igshid$/i,
+  /^vero_/i,
+  /^ref$/i,
+  /^ref_src$/i,
+  /^ref_url$/i,
+];
+
+function canonicalizeUrl(raw) {
+  if (!raw) return raw;
+  try {
+    const u = new URL(raw);
+    const keep = [];
+    for (const [k, v] of u.searchParams.entries()) {
+      if (TRACKING_PARAM_PATTERNS.some((p) => p.test(k))) continue;
+      keep.push([k, v]);
+    }
+    u.search = "";
+    for (const [k, v] of keep) u.searchParams.append(k, v);
+    u.hash = "";
+    return u.toString();
+  } catch {
+    return raw;
+  }
+}
+
 function extractTechmemeSourceUrl(item) {
   // Techmeme RSS <link> goes to a discussion page; the source URL is the first
   // non-techmeme href in the (uppercase) HTML content.
@@ -47,6 +84,7 @@ async function fetchFeed(parser, feed) {
         const sourceUrl = extractTechmemeSourceUrl(item);
         if (sourceUrl) url = sourceUrl;
       }
+      url = canonicalizeUrl(url);
       return {
         url,
         title: (item.title ?? "").trim() || "(untitled)",
@@ -68,7 +106,7 @@ function loadPastNoteUrls() {
     if (!/^\d{4}-\d{2}-\d{2}\.json$/.test(f)) continue;
     try {
       const note = JSON.parse(fs.readFileSync(path.join(NOTES_DIR, f), "utf-8"));
-      if (note.url) set.add(note.url);
+      if (note.url) set.add(canonicalizeUrl(note.url));
     } catch {}
   }
   return set;
@@ -233,7 +271,10 @@ Output ONLY a JSON object, no prose around it. Schema:
     process.exit(0);
   }
 
-  const matched = shortlist.find((c) => c.url === parsed.url);
+  const returnedCanonical = canonicalizeUrl(parsed.url);
+  const matched =
+    shortlist.find((c) => c.url === parsed.url) ??
+    shortlist.find((c) => canonicalizeUrl(c.url) === returnedCanonical);
   if (!matched) {
     throw new Error(`Returned URL not in candidate list: ${parsed.url}`);
   }
