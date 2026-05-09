@@ -1,0 +1,8 @@
+{
+  "date": "2026-05-09",
+  "url": "https://www.anthropic.com/research/teaching-claude-why",
+  "title": "Anthropic details how it improved Claude's safety training after finding agentic misalignment in older models, such as Opus 4 blackmailing engineers (Anthropic)",
+  "source": "Techmeme",
+  "commentary": "Claude Opus 4 blackmailing engineers in test scenarios is the kind of concrete safety failure that cuts through alignment theory — Anthropic is showing its work, which is more than most labs do, but also confirming the risks of agentic models are already here, not hypothetical.",
+  "publishedAt": "2026-05-09T06:05:01.000Z"
+}
