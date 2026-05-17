@@ -247,37 +247,74 @@ Output ONLY a JSON object, no prose around it. Schema:
   );
 
   const client = new Anthropic({ apiKey });
-  const response = await client.messages.create({
+
+  function findMatch(url) {
+    if (!url) return null;
+    const canon = canonicalizeUrl(url);
+    return (
+      shortlist.find((c) => c.url === url) ??
+      shortlist.find((c) => canonicalizeUrl(c.url) === canon) ??
+      null
+    );
+  }
+
+  function extractText(resp) {
+    return resp.content
+      .filter((b) => b.type === "text")
+      .map((b) => b.text)
+      .join("");
+  }
+
+  const initialUserMessage = {
+    role: "user",
+    content: `Today's date: ${date}.\n\nCandidates:\n${candidatePayload}`,
+  };
+
+  let response = await client.messages.create({
     model: MODEL,
     max_tokens: 600,
     system: systemPrompt,
-    messages: [
-      {
-        role: "user",
-        content: `Today's date: ${date}.\n\nCandidates:\n${candidatePayload}`,
-      },
-    ],
+    messages: [initialUserMessage],
   });
 
-  const text = response.content
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("");
-
-  const parsed = extractJson(text);
+  let parsed = extractJson(extractText(response));
 
   if (parsed.skip) {
     log("Claude chose to skip:", parsed.reason);
     process.exit(0);
   }
 
-  const returnedCanonical = canonicalizeUrl(parsed.url);
-  const matched =
-    shortlist.find((c) => c.url === parsed.url) ??
-    shortlist.find((c) => canonicalizeUrl(c.url) === returnedCanonical);
+  let matched = findMatch(parsed.url);
+
   if (!matched) {
-    throw new Error(`Returned URL not in candidate list: ${parsed.url}`);
+    log(`Returned URL not in candidate list: ${parsed.url}. Retrying with explicit URL list.`);
+    const validUrls = shortlist.map((c) => `- ${c.url}`).join("\n");
+    response = await client.messages.create({
+      model: MODEL,
+      max_tokens: 600,
+      system: systemPrompt,
+      messages: [
+        initialUserMessage,
+        { role: "assistant", content: extractText(response) },
+        {
+          role: "user",
+          content: `The URL "${parsed.url}" is NOT in the candidate list. Do not invent or guess URLs from headlines. Pick a different article whose URL appears verbatim in this list:\n\n${validUrls}\n\nOutput ONLY the JSON object as before, with a url copied verbatim from the list above (or {"skip": true, "reason": "..."}).`,
+        },
+      ],
+    });
+    parsed = extractJson(extractText(response));
+    if (parsed.skip) {
+      log("Claude chose to skip on retry:", parsed.reason);
+      process.exit(0);
+    }
+    matched = findMatch(parsed.url);
   }
+
+  if (!matched) {
+    log(`Retry also returned a URL not in candidate list: ${parsed.url}. Skipping today rather than failing.`);
+    process.exit(0);
+  }
+
   if (typeof parsed.commentary !== "string" || parsed.commentary.trim().length < 10) {
     throw new Error("Missing or too-short commentary");
   }
