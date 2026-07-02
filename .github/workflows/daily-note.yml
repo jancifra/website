@@ -20,6 +20,9 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    # Safety net: the whole job is minutes of work. If it ever hangs again,
+    # fail fast instead of burning up to GitHub's 6h default timeout.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:

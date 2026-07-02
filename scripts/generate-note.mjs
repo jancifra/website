@@ -132,9 +132,43 @@ function loadRecentNotes(limit) {
 }
 
 function extractJson(text) {
-  const m = text.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error("No JSON object found in model response: " + text);
-  return JSON.parse(m[0]);
+  const start = text.indexOf("{");
+  if (start === -1) throw new Error("No JSON object found in model response: " + text);
+
+  // Fast path: a complete, well-formed object (greedy to the last brace).
+  const greedy = text.slice(start).match(/\{[\s\S]*\}/);
+  if (greedy) {
+    try {
+      return JSON.parse(greedy[0]);
+    } catch {
+      // fall through to truncation repair
+    }
+  }
+
+  // The model sometimes emits a long reasoning preamble and the JSON gets cut
+  // off mid-string by max_tokens. Repair a truncated trailing object by closing
+  // an open string and any unclosed braces, so a mostly-complete pick (commentary
+  // is the last field) still yields a usable note instead of a hard failure.
+  let inString = false;
+  let escaped = false;
+  let depth = 0;
+  let end = -1;
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (escaped) { escaped = false; continue; }
+    if (ch === "\\") { escaped = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === "{") depth++;
+    else if (ch === "}") { depth--; if (depth === 0) { end = i; break; } }
+  }
+
+  let candidate = end === -1 ? text.slice(start) : text.slice(start, end + 1);
+  if (end === -1) {
+    if (inString) candidate += '"';
+    candidate += "}".repeat(Math.max(depth, 1));
+  }
+  return JSON.parse(candidate);
 }
 
 async function main() {
@@ -272,7 +306,7 @@ Output ONLY a JSON object, no prose around it. Schema:
 
   let response = await client.messages.create({
     model: MODEL,
-    max_tokens: 600,
+    max_tokens: 1500,
     system: systemPrompt,
     messages: [initialUserMessage],
   });
@@ -291,7 +325,7 @@ Output ONLY a JSON object, no prose around it. Schema:
     const validUrls = shortlist.map((c) => `- ${c.url}`).join("\n");
     response = await client.messages.create({
       model: MODEL,
-      max_tokens: 600,
+      max_tokens: 1500,
       system: systemPrompt,
       messages: [
         initialUserMessage,
@@ -341,6 +375,11 @@ Output ONLY a JSON object, no prose around it. Schema:
     ].join("\n");
     fs.appendFileSync(process.env.GITHUB_OUTPUT, lines + "\n");
   }
+
+  // Exit explicitly: rss-parser and the Anthropic SDK can leave keep-alive
+  // sockets open, which otherwise keeps the event loop alive and hangs the
+  // process (and the CI step) until the job's 6h timeout.
+  process.exit(0);
 }
 
 main().catch((err) => {
