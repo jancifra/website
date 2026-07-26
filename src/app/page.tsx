@@ -231,6 +231,21 @@ export default function Home() {
           </Link>
         </section>
 
+        {/* Media teaser */}
+        <section>
+          <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">In the media</h2>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+            Interviews and coverage in Forbes, SME, Denník N, Startitup, and other Slovak outlets — mostly on
+            Dedoles, e-commerce, and turnarounds.
+          </p>
+          <Link
+            href="/media"
+            className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline underline-offset-4"
+          >
+            View media mentions →
+          </Link>
+        </section>
+
         {/* Contact */}
         <section id="contact">
           <h2 className="text-xs font-semibold tracking-widest uppercase text-zinc-400 dark:text-zinc-500 mb-6">Contact</h2>
