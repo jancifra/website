@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Parser from "rss-parser";
 import Anthropic from "@anthropic-ai/sdk";
+import { canonicalizeUrl, extractJson, loadPastNoteUrls, loadRecentNotes } from "./note-utils.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,43 +26,6 @@ function todayDate() {
 
 function log(...args) {
   console.error("[generate-note]", ...args);
-}
-
-// Tracking params we strip so the LLM doesn't have a reason to "clean up" the
-// URL we hand it (and so different feed surfacings of the same article dedupe).
-const TRACKING_PARAM_PATTERNS = [
-  /^utm_/i,
-  /^mc_/i,
-  /^_ga$/i,
-  /^_gl$/i,
-  /^fbclid$/i,
-  /^gclid$/i,
-  /^msclkid$/i,
-  /^dclid$/i,
-  /^yclid$/i,
-  /^igshid$/i,
-  /^vero_/i,
-  /^ref$/i,
-  /^ref_src$/i,
-  /^ref_url$/i,
-];
-
-function canonicalizeUrl(raw) {
-  if (!raw) return raw;
-  try {
-    const u = new URL(raw);
-    const keep = [];
-    for (const [k, v] of u.searchParams.entries()) {
-      if (TRACKING_PARAM_PATTERNS.some((p) => p.test(k))) continue;
-      keep.push([k, v]);
-    }
-    u.search = "";
-    for (const [k, v] of keep) u.searchParams.append(k, v);
-    u.hash = "";
-    return u.toString();
-  } catch {
-    return raw;
-  }
 }
 
 function extractTechmemeSourceUrl(item) {
@@ -100,78 +64,6 @@ async function fetchFeed(parser, feed) {
   }
 }
 
-function loadPastNoteUrls() {
-  if (!fs.existsSync(NOTES_DIR)) return new Set();
-  const set = new Set();
-  for (const f of fs.readdirSync(NOTES_DIR)) {
-    if (!/^\d{4}-\d{2}-\d{2}\.json$/.test(f)) continue;
-    try {
-      const note = JSON.parse(fs.readFileSync(path.join(NOTES_DIR, f), "utf-8"));
-      if (note.url) set.add(canonicalizeUrl(note.url));
-    } catch {}
-  }
-  return set;
-}
-
-function loadRecentNotes(limit) {
-  if (!fs.existsSync(NOTES_DIR)) return [];
-  const files = fs
-    .readdirSync(NOTES_DIR)
-    .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
-    .sort()
-    .reverse()
-    .slice(0, limit);
-  return files
-    .map((f) => {
-      try {
-        return JSON.parse(fs.readFileSync(path.join(NOTES_DIR, f), "utf-8"));
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
-}
-
-function extractJson(text) {
-  const start = text.indexOf("{");
-  if (start === -1) throw new Error("No JSON object found in model response: " + text);
-
-  // Fast path: a complete, well-formed object (greedy to the last brace).
-  const greedy = text.slice(start).match(/\{[\s\S]*\}/);
-  if (greedy) {
-    try {
-      return JSON.parse(greedy[0]);
-    } catch {
-      // fall through to truncation repair
-    }
-  }
-
-  // The model sometimes emits a long reasoning preamble and the JSON gets cut
-  // off mid-string by max_tokens. Repair a truncated trailing object by closing
-  // an open string and any unclosed braces, so a mostly-complete pick (commentary
-  // is the last field) still yields a usable note instead of a hard failure.
-  let inString = false;
-  let escaped = false;
-  let depth = 0;
-  let end = -1;
-  for (let i = start; i < text.length; i++) {
-    const ch = text[i];
-    if (escaped) { escaped = false; continue; }
-    if (ch === "\\") { escaped = true; continue; }
-    if (ch === '"') { inString = !inString; continue; }
-    if (inString) continue;
-    if (ch === "{") depth++;
-    else if (ch === "}") { depth--; if (depth === 0) { end = i; break; } }
-  }
-
-  let candidate = end === -1 ? text.slice(start) : text.slice(start, end + 1);
-  if (end === -1) {
-    if (inString) candidate += '"';
-    candidate += "}".repeat(Math.max(depth, 1));
-  }
-  return JSON.parse(candidate);
-}
-
 async function main() {
   const date = todayDate();
   const force = !!process.env.FORCE_NOTE && process.env.FORCE_NOTE !== "0" && process.env.FORCE_NOTE !== "false";
@@ -196,8 +88,8 @@ async function main() {
   const sources = JSON.parse(fs.readFileSync(SOURCES_PATH, "utf-8"));
   const profile = fs.readFileSync(PROFILE_PATH, "utf-8");
 
-  const pastUrls = loadPastNoteUrls();
-  const recentNotes = loadRecentNotes(RECENT_CONTEXT_NOTES);
+  const pastUrls = loadPastNoteUrls(NOTES_DIR);
+  const recentNotes = loadRecentNotes(NOTES_DIR, RECENT_CONTEXT_NOTES);
   log(`${pastUrls.size} past notes loaded for dedupe; ${recentNotes.length} recent notes for diversity context.`);
 
   const parser = new Parser({ timeout: 15000 });
