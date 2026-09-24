@@ -1,0 +1,8 @@
+{
+  "date": "2026-08-10",
+  "url": "https://www.scmp.com/tech/big-tech/article/3363491/chinas-top-ai-still-trained-nvidia-chips-what-delaying-switch-local-tech",
+  "title": "Sources: Nvidia chips remain the norm for Chinese AI labs training LLMs, as switching from its CUDA platform to Huawei's CANN requires major code rewriting (South China Morning Post)",
+  "source": "Techmeme",
+  "commentary": "Export controls were supposed to accelerate China's chip independence, but CUDA lock-in is doing more to protect Nvidia's moat than any US trade policy. Rewriting your entire ML stack to run on Huawei hardware isn't a weekend project.",
+  "publishedAt": "2026-08-10T09:25:02.000Z"
+}
