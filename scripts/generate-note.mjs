@@ -12,7 +12,8 @@ const NOTES_DIR = path.join(ROOT, "content/notes");
 const SOURCES_PATH = path.join(NOTES_DIR, "sources.json");
 const PROFILE_PATH = path.join(NOTES_DIR, "profile.md");
 
-const LOOKBACK_HOURS = 48;
+// Covers the longest gap between scheduled runs (Fri → Mon).
+const LOOKBACK_HOURS = 72;
 const MAX_PER_FEED = 6;
 const SHORTLIST_SIZE = 60;
 const RECENT_CONTEXT_NOTES = 10;
