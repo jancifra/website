@@ -19,8 +19,10 @@ permissions:
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    # Notes are generated sequentially with web search, ~1–2 min each.
-    timeout-minutes: 60
+    # Notes are generated sequentially with web search and each can take several
+    # minutes. The script stops starting new dates at BACKFILL_BUDGET_MINUTES so
+    # the PR step runs well before this timeout.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,9 +40,12 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.CIFRA_NOTES_CRON }}
           BACKFILL_FROM: ${{ inputs.from }}
           BACKFILL_TO: ${{ inputs.to }}
+          BACKFILL_BUDGET_MINUTES: "100"
         run: npm run note:backfill
 
       - name: Open pull request
+        # Still open a PR with whatever was written if the backfill step failed.
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FROM: ${{ inputs.from }}

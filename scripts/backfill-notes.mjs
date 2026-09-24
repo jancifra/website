@@ -23,6 +23,12 @@ const RECENT_CONTEXT_NOTES = 10;
 const MAX_ATTEMPTS = 3;
 const MAX_PAUSE_RESUMES = 3;
 const MAX_SEARCHES_PER_REQUEST = 8;
+// Web-search turns can run for minutes; stream so the connection stays active,
+// and cap each request so one stuck call can't eat the job.
+const REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
+// Stop starting new dates after this, so the workflow still gets to open a PR
+// with what's done before the job timeout. Re-run for the remaining dates.
+const TIME_BUDGET_MS = Number(process.env.BACKFILL_BUDGET_MINUTES || 100) * 60 * 1000;
 const PUBLISH_DAYS = new Set([1, 3, 5]); // Mon, Wed, Fri (UTC), matching the cron
 const DAY_MS = 24 * 3600 * 1000;
 
@@ -164,13 +170,22 @@ or {"skip": true, "reason": "<one short sentence>"}.`;
 
 async function runTurn(client, system, messages, searchResults) {
   for (let resumes = 0; ; resumes++) {
-    const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 4000,
-      system,
-      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: MAX_SEARCHES_PER_REQUEST }],
-      messages,
-    });
+    const response = await client.messages
+      .stream(
+        {
+          model: MODEL,
+          max_tokens: 4000,
+          system,
+          tools: [{ type: "web_search_20260209", name: "web_search", max_uses: MAX_SEARCHES_PER_REQUEST }],
+          messages,
+        },
+        { timeout: REQUEST_TIMEOUT_MS, maxRetries: 1 },
+      )
+      .finalMessage();
+    const u = response.usage;
+    log(
+      `  request: stop=${response.stop_reason} in=${u.input_tokens + (u.cache_read_input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0)} out=${u.output_tokens} searches=${u.server_tool_use?.web_search_requests ?? 0}`,
+    );
     collectSearchResults(response.content, searchResults);
     messages.push({ role: "assistant", content: response.content });
     if (response.stop_reason !== "pause_turn" || resumes >= MAX_PAUSE_RESUMES) return response;
@@ -254,9 +269,16 @@ async function main() {
 
   // Sequential on purpose: each note's diversity context includes the ones
   // backfilled just before it.
-  for (const date of dates) {
+  const startedAt = Date.now();
+  for (const [i, date] of dates.entries()) {
+    if (Date.now() - startedAt > TIME_BUDGET_MS) {
+      log(`Time budget reached; not started: ${dates.slice(i).join(", ")}. Re-run for these.`);
+      break;
+    }
+    const dateStartedAt = Date.now();
     try {
       const note = await backfillDate(client, profile, date);
+      log(`${date}: took ${Math.round((Date.now() - dateStartedAt) / 1000)}s`);
       if (!note) continue;
       const outPath = path.join(NOTES_DIR, `${date}.json`);
       fs.writeFileSync(outPath, JSON.stringify(note, null, 2) + "\n");
