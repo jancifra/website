@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Parser from "rss-parser";
 import Anthropic from "@anthropic-ai/sdk";
-import { canonicalizeUrl, extractJson, loadPastNoteUrls, loadRecentNotes } from "./note-utils.mjs";
+import { buildShortlist, fetchFeedItems, loadPastNoteUrls, loadRecentNotes, pickNote } from "./note-utils.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,42 +26,6 @@ function todayDate() {
 
 function log(...args) {
   console.error("[generate-note]", ...args);
-}
-
-function extractTechmemeSourceUrl(item) {
-  // Techmeme RSS <link> goes to a discussion page; the source URL is the first
-  // non-techmeme href in the (uppercase) HTML content.
-  const html = String(item.content ?? "");
-  const matches = [...html.matchAll(/href="(https?:\/\/[^"]+)"/gi)];
-  for (const m of matches) {
-    const u = m[1];
-    if (!/techmeme\.com/i.test(u)) return u;
-  }
-  return null;
-}
-
-async function fetchFeed(parser, feed) {
-  try {
-    const parsed = await parser.parseURL(feed.url);
-    return (parsed.items ?? []).map((item) => {
-      let url = item.link;
-      if (feed.name === "Techmeme") {
-        const sourceUrl = extractTechmemeSourceUrl(item);
-        if (sourceUrl) url = sourceUrl;
-      }
-      url = canonicalizeUrl(url);
-      return {
-        url,
-        title: (item.title ?? "").trim() || "(untitled)",
-        source: feed.name,
-        publishedAt: item.isoDate ?? item.pubDate ?? null,
-        summary: ((item.contentSnippet ?? item.content ?? "") + "").replace(/\s+/g, " ").trim().slice(0, 400),
-      };
-    });
-  } catch (err) {
-    log(`feed failed: ${feed.name} (${feed.url}) — ${err.message}`);
-    return [];
-  }
 }
 
 async function main() {
@@ -95,34 +59,25 @@ async function main() {
   const parser = new Parser({ timeout: 15000 });
   const cutoff = Date.now() - LOOKBACK_HOURS * 3600 * 1000;
 
-  const allItems = (await Promise.all(sources.feeds.map((f) => fetchFeed(parser, f)))).flat();
+  const allItems = (
+    await Promise.all(
+      sources.feeds.map((f) =>
+        fetchFeedItems(parser, f).catch((err) => {
+          log(`feed failed: ${f.name} (${f.url}) — ${err.message}`);
+          return [];
+        }),
+      ),
+    )
+  ).flat();
 
-  const fresh = allItems
-    .filter((it) => it.url)
-    .filter((it) => !pastUrls.has(it.url))
-    .filter((it) => {
-      if (!it.publishedAt) return true;
-      const t = new Date(it.publishedAt).getTime();
-      return Number.isFinite(t) ? t >= cutoff : true;
-    });
+  const { fresh, shortlist } = buildShortlist(allItems, {
+    pastUrls,
+    windowStart: cutoff,
+    maxPerFeed: MAX_PER_FEED,
+    size: SHORTLIST_SIZE,
+  });
 
   log(`${allItems.length} total items fetched, ${fresh.length} fresh after dedupe + recency.`);
-
-  const bySource = new Map();
-  for (const it of fresh) {
-    const arr = bySource.get(it.source) ?? [];
-    if (arr.length < MAX_PER_FEED) {
-      arr.push(it);
-      bySource.set(it.source, arr);
-    }
-  }
-  let shortlist = [...bySource.values()].flat();
-  shortlist.sort((a, b) => {
-    const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-    const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-    return tb - ta;
-  });
-  shortlist = shortlist.slice(0, SHORTLIST_SIZE);
 
   if (shortlist.length === 0) {
     log("No fresh candidates — nothing to pick.");
@@ -131,129 +86,9 @@ async function main() {
 
   log(`Sending ${shortlist.length} candidates to Claude (${MODEL})…`);
 
-  const recentBlock = recentNotes.length
-    ? `Recently posted notes (most recent first):
-
-${recentNotes
-  .map((n) => `- [${n.date}] "${n.title}" (${n.source}) — ${n.commentary}`)
-  .join("\n")}
-
-Diversity rules:
-- Do NOT pick a near-duplicate of any recent note above — same company's same funding round, same regulation's same vote, same product's same launch, same deal seen from a different outlet. A different angle on a still-developing story is OK only if it adds substantively new information.
-- Prefer topical variety. If the last few notes leaned heavily into one theme (e.g. AI funding, or EU regulation), tilt today's pick toward an under-represented theme from the curator profile (regulation, antitrust/M&A, big tech strategy, CEE ecosystem, operating playbooks, etc.).
-- It's better to skip than to repeat. If the only "good" candidate is a follow-up to yesterday's story and nothing else clears the bar, output {"skip": true, "reason": "..."}.`
-    : "No prior notes — first post.";
-
-  const systemPrompt = `${profile}
-
----
-
-${recentBlock}
-
----
-
-You are picking ONE article from the candidate list below for today's note.
-
-Rules:
-- The "url" you return MUST be one of the candidate URLs verbatim. Do not invent or rewrite URLs.
-- Commentary: 1–2 sentences, max 50 words, in the voice described above.
-- If nothing in the list is genuinely interesting per the topic and quality bar, OR everything is a near-duplicate of recent notes, output {"skip": true, "reason": "<one short sentence>"}.
-
-Output ONLY a JSON object, no prose around it. Schema:
-{"url": "...", "title": "...", "source": "...", "commentary": "..."}`;
-
-  const candidatePayload = JSON.stringify(
-    shortlist.map((c) => ({
-      url: c.url,
-      title: c.title,
-      source: c.source,
-      summary: c.summary,
-    })),
-    null,
-    2,
-  );
-
   const client = new Anthropic({ apiKey });
-
-  function findMatch(url) {
-    if (!url) return null;
-    const canon = canonicalizeUrl(url);
-    return (
-      shortlist.find((c) => c.url === url) ??
-      shortlist.find((c) => canonicalizeUrl(c.url) === canon) ??
-      null
-    );
-  }
-
-  function extractText(resp) {
-    return resp.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("");
-  }
-
-  const initialUserMessage = {
-    role: "user",
-    content: `Today's date: ${date}.\n\nCandidates:\n${candidatePayload}`,
-  };
-
-  let response = await client.messages.create({
-    model: MODEL,
-    max_tokens: 1500,
-    system: systemPrompt,
-    messages: [initialUserMessage],
-  });
-
-  let parsed = extractJson(extractText(response));
-
-  if (parsed.skip) {
-    log("Claude chose to skip:", parsed.reason);
-    process.exit(0);
-  }
-
-  let matched = findMatch(parsed.url);
-
-  if (!matched) {
-    log(`Returned URL not in candidate list: ${parsed.url}. Retrying with explicit URL list.`);
-    const validUrls = shortlist.map((c) => `- ${c.url}`).join("\n");
-    response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 1500,
-      system: systemPrompt,
-      messages: [
-        initialUserMessage,
-        { role: "assistant", content: extractText(response) },
-        {
-          role: "user",
-          content: `The URL "${parsed.url}" is NOT in the candidate list. Do not invent or guess URLs from headlines. Pick a different article whose URL appears verbatim in this list:\n\n${validUrls}\n\nOutput ONLY the JSON object as before, with a url copied verbatim from the list above (or {"skip": true, "reason": "..."}).`,
-        },
-      ],
-    });
-    parsed = extractJson(extractText(response));
-    if (parsed.skip) {
-      log("Claude chose to skip on retry:", parsed.reason);
-      process.exit(0);
-    }
-    matched = findMatch(parsed.url);
-  }
-
-  if (!matched) {
-    log(`Retry also returned a URL not in candidate list: ${parsed.url}. Skipping today rather than failing.`);
-    process.exit(0);
-  }
-
-  if (typeof parsed.commentary !== "string" || parsed.commentary.trim().length < 10) {
-    throw new Error("Missing or too-short commentary");
-  }
-
-  const note = {
-    date,
-    url: matched.url,
-    title: matched.title,
-    source: matched.source,
-    commentary: parsed.commentary.trim(),
-    publishedAt: matched.publishedAt ?? null,
-  };
+  const note = await pickNote({ client, model: MODEL, profile, recentNotes, shortlist, date, log });
+  if (!note) process.exit(0);
 
   fs.mkdirSync(NOTES_DIR, { recursive: true });
   fs.writeFileSync(outPath, JSON.stringify(note, null, 2) + "\n");

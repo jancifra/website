@@ -19,10 +19,9 @@ permissions:
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    # Notes are generated sequentially with web search and each can take several
-    # minutes. The script stops starting new dates at BACKFILL_BUDGET_MINUTES so
-    # the PR step runs well before this timeout.
-    timeout-minutes: 120
+    # One pick per date from feed/day-archive candidates, like the daily job;
+    # most of the time is polite feed fetching with 429 backoff.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,7 +39,6 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.CIFRA_NOTES_CRON }}
           BACKFILL_FROM: ${{ inputs.from }}
           BACKFILL_TO: ${{ inputs.to }}
-          BACKFILL_BUDGET_MINUTES: "100"
         run: npm run note:backfill
 
       - name: Open pull request
@@ -58,7 +56,7 @@ jobs:
             exit 0
           fi
 
-          BRANCH="note/backfill-${FROM}-to-${TO}"
+          BRANCH="note/backfill-${FROM}-to-${TO}-${GITHUB_RUN_ID}"
           COUNT=$(echo "$NEW_FILES" | wc -l | tr -d ' ')
 
           git config user.name "github-actions[bot]"
